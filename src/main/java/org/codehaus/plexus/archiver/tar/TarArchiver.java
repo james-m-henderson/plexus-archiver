@@ -74,41 +74,8 @@ public class TarArchiver
     public void setOptions( TarOptions options )
     {
         this.options = options;
-
-        // FIXME: do these options have precedence over
-        // setDefaultFileMode / setDefaultDirMode
-        // or the other way around? Assuming these
-        // take precedende since they're more specific.
-        // Better refactor this when usage is known.
-
-        setDefaultFileMode( options.getMode() );
-
-        setDefaultDirectoryMode( options.getMode() );
     }
 
-//    /**
-//     * Override AbstractArchiver.setDefaultFileMode to
-//     * update TarOptions.
-//     */
-//    public void setDefaultFileMode( int mode )
-//    {
-//        super.setDefaultFileMode( mode );
-//
-//        options.setMode( mode );
-//    }
-//
-//    /**
-//     * Override AbstractArchiver.setDefaultDirectoryMode to
-//     * update TarOptions.
-//     */
-//    public void setDefaultDirectoryMode( int mode )
-//    {
-//        super.setDefaultDirectoryMode( mode );
-//
-//        options.setDirMode( mode );
-//    }
-//
-//
     /**
      * Set how to handle long files, those with a path&gt;100 chars.
      * Optional, default=warn.
@@ -381,16 +348,6 @@ public class TarArchiver
      */
     public class TarOptions
     {
-        /**
-         * @deprecated
-         */
-        private int fileMode = UnixStat.FILE_FLAG | UnixStat.DEFAULT_FILE_PERM;
-
-        /**
-         * @deprecated
-         */
-        private int dirMode = UnixStat.DIR_FLAG | UnixStat.DEFAULT_DIR_PERM;
-
         private String userName = "";
 
         private String groupName = "";
@@ -400,70 +357,6 @@ public class TarArchiver
         private int gid;
 
         private boolean preserveLeadingSlashes = false;
-
-        /**
-         * A 3 digit octal string, specify the user, group and
-         * other modes in the standard Unix fashion;
-         * optional, default=0644
-         *
-         * @param octalString a 3 digit octal string.
-         * @deprecated use AbstractArchiver.setDefaultFileMode(int)
-         */
-        public void setMode( String octalString )
-        {
-            setMode( Integer.parseInt( octalString, 8 ) );
-        }
-
-        /**
-         * @param mode unix file mode
-         * @deprecated use AbstractArchiver.setDefaultFileMode(int)
-         */
-        public void setMode( int mode )
-        {
-            this.fileMode = UnixStat.FILE_FLAG | ( mode & UnixStat.PERM_MASK );
-        }
-
-        /**
-         * @return the current mode.
-         * @deprecated use AbstractArchiver.getDefaultFileMode()
-         */
-        public int getMode()
-        {
-            return fileMode;
-        }
-
-        /**
-         * A 3 digit octal string, specify the user, group and
-         * other modes in the standard Unix fashion;
-         * optional, default=0755
-         *
-         * @param octalString a 3 digit octal string.
-         * @since Ant 1.6
-         * @deprecated use AbstractArchiver.setDefaultDirectoryMode(int)
-         */
-        public void setDirMode( String octalString )
-        {
-            setDirMode( Integer.parseInt( octalString, 8 ) );
-        }
-
-        /**
-         * @param mode unix directory mode
-         * @deprecated use AbstractArchiver.setDefaultDirectoryMode(int)
-         */
-        public void setDirMode( int mode )
-        {
-            this.dirMode = UnixStat.DIR_FLAG | ( mode & UnixStat.PERM_MASK );
-        }
-
-        /**
-         * @return the current directory mode
-         * @since Ant 1.6
-         * @deprecated use AbstractArchiver.getDefaultDirectoryMode()
-         */
-        public int getDirMode()
-        {
-            return dirMode;
-        }
 
         /**
          * The username for the tar entry
@@ -585,7 +478,6 @@ public class TarArchiver
          * BZIP2 compression
          */
         private static final String BZIP2 = "bzip2";
-
 
         /**
          * Default constructor

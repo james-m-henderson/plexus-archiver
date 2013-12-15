@@ -272,20 +272,28 @@ public class TarArchiverTest
     public void testCreateArchive()
         throws Exception
     {
+        createArchive(0500, new int[] {0400, 0640, 0664});
+        createArchive(0500, new int[] {0400, 0640, 0664});
+    }
+
+    public void createArchive(final int directoryMode, final int fileModes[])
+        throws Exception
+    {
+        int defaultFileMode = fileModes[0];
+        int oneFileMode = fileModes[1];
+        int twoFileMode = fileModes[2];
+
         TarArchiver archiver = (TarArchiver) lookup( Archiver.ROLE, "tar" );
 
-        archiver.setDirectoryMode( 0500 );
-        archiver.getOptions().setDirMode( 0500 );
+        archiver.setDirectoryMode( directoryMode );
 
-        archiver.setFileMode( 0400 );
-        archiver.getOptions().setMode( 0400 );
+        archiver.setFileMode( defaultFileMode );
 
         archiver.addDirectory( getTestFile( "src" ) );
-        archiver.setFileMode( 0640 );
-        archiver.getOptions().setMode( 0640 );
+        archiver.setFileMode( oneFileMode );
 
         archiver.addFile( getTestFile( "src/test/resources/manifests/manifest1.mf" ), "one.txt" );
-        archiver.addFile( getTestFile( "src/test/resources/manifests/manifest2.mf" ), "two.txt", 0664 );
+        archiver.addFile( getTestFile( "src/test/resources/manifests/manifest2.mf" ), "two.txt", twoFileMode );
         archiver.setDestFile( getTestFile( "target/output/archive.tar" ) );
         archiver.createArchive();
 
@@ -298,21 +306,21 @@ public class TarArchiverTest
         {
             if ( te.isDirectory() )
             {
-                assertEquals( 0500, te.getMode() & UnixStat.PERM_MASK );
+                assertEquals( directoryMode, te.getMode() & UnixStat.PERM_MASK );
             }
             else
             {
                 if ( te.getName().equals( "one.txt" ) )
                 {
-                    assertEquals( 0640, te.getMode() & UnixStat.PERM_MASK );
+                    assertEquals( oneFileMode, te.getMode() & UnixStat.PERM_MASK );
                 }
                 else if ( te.getName().equals( "two.txt" ) )
                 {
-                    assertEquals( 0664, te.getMode() & UnixStat.PERM_MASK );
+                    assertEquals( twoFileMode, te.getMode() & UnixStat.PERM_MASK );
                 }
                 else
                 {
-                    assertEquals( 0400, te.getMode() & UnixStat.PERM_MASK );
+                    assertEquals( defaultFileMode, te.getMode() & UnixStat.PERM_MASK );
                 }
 
             }
